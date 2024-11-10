@@ -9,6 +9,7 @@
 #define INC_SOFTWARE_TIMER_H_
 
 extern int timer1_flag;
+extern int timer1_counter;
 extern int timer2_flag;
 extern int timer3_flag;
 extern int timer4_flag;

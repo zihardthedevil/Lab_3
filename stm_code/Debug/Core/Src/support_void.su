@@ -1,0 +1,4 @@
+../Core/Src/support_void.c:9:6:display7SEG	16	static
+../Core/Src/support_void.c:112:6:updateRealTime	16	static
+../Core/Src/support_void.c:118:6:led_display	8	static
+../Core/Src/support_void.c:156:6:led7_run	8	static
