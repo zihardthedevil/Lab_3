@@ -21,12 +21,13 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "software_timer.h"
-#include "button.h"
-#include "fsm_automatic.h"
-#include "global.h"
-#include "fsm_manual.h"
-#include "support_void.h"
+//#include "software_timer.h"
+//#include "button.h"
+//#include "fsm_automatic.h"
+//#include "global.h"
+//#include "fsm_manual.h"
+#//include "support_void.h"
+#include "scheduler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,6 +69,9 @@ static void MX_TIM2_Init(void);
   * @brief  The application entry point.
   * @retval int
   */
+void led1test() {
+	HAL_GPIO_TogglePin(GPIOA, Led_Red_Pin);
+}
 int main(void)
 {
 
@@ -100,14 +104,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  status = INIT;
-  scanLEDState = 1;
-  setTimer1(50);
-  setTimer3(50);
+  SCH_Add_Task(led1test, 100, 200);
   while (1)
   {
-	fsm_automatic_run();
-	fsm_manual_run();
+	  SCH_Dispatch_Tasks();
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -252,8 +253,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-	timerRun();
-	getKeyInput();
+	SCH_Update();
 }
 /* USER CODE END 4 */
 

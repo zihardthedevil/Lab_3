@@ -11,13 +11,12 @@ int SetGreenTime = 0;
 void fsm_manual_run() {
 	switch (status) {
 	case MAN_RED:
-		HAL_GPIO_WritePin(LRY_GPIO_Port, LRY_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LYY_GPIO_Port, LYY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LGY_GPIO_Port, LGY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LRX_GPIO_Port, LRX_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LYX_GPIO_Port, LYX_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LGX_GPIO_Port, LGX_Pin, GPIO_PIN_RESET);
-		updateRealTime(SetRedTime,SetRedTime);
+		if (timer4_flag == 1) {
+			setTimer4(250);
+			HAL_GPIO_TogglePin(GPIOA, LRY_Pin|LRX_Pin);
+		}
+		HAL_GPIO_WritePin(GPIOA, LYY_Pin|LYX_Pin|LGY_Pin|LGX_Pin, GPIO_PIN_RESET);
+		updateRealTime(SetRedTime,2);
 		if (timer1_flag == 1) {
 			status = AUTO_GREEN_Y;
 			setTimer1(5000);
@@ -26,10 +25,12 @@ void fsm_manual_run() {
 			status = MAN_YELLOW;
 			SetYellowTime = LedYellowTime;
 			setTimer1(10000);
+			setTimer4(250);
+			HAL_GPIO_WritePin(GPIOA, LYY_Pin|LYX_Pin, GPIO_PIN_SET);
 		}
 		if (isButton2Pressed() == 1) {
 			SetRedTime++;
-			updateRealTime(SetRedTime,SetRedTime);
+			updateRealTime(SetRedTime,2);
 		}
 		led7_run();
 		if (isButton3Pressed() == 1) {
@@ -44,13 +45,12 @@ void fsm_manual_run() {
 		}
 		break;
 	case MAN_YELLOW:
-		HAL_GPIO_WritePin(LRY_GPIO_Port, LRY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LYY_GPIO_Port, LYY_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LGY_GPIO_Port, LGY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LRX_GPIO_Port, LRX_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LYX_GPIO_Port, LYX_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LGX_GPIO_Port, LGX_Pin, GPIO_PIN_RESET);
-		updateRealTime(SetYellowTime,SetYellowTime);
+		if (timer4_flag == 1) {
+			setTimer4(250);
+			HAL_GPIO_TogglePin(GPIOA, LYY_Pin|LYX_Pin);
+		}
+		HAL_GPIO_WritePin(GPIOA, LGY_Pin|LGX_Pin|LRY_Pin|LRX_Pin, GPIO_PIN_RESET);
+		updateRealTime(SetYellowTime,3);
 		if (timer1_flag == 1) {
 			status = AUTO_GREEN_Y;
 			setTimer1(5000);
@@ -59,10 +59,12 @@ void fsm_manual_run() {
 			status = MAN_GREEN;
 			SetGreenTime = LedGreenTime;
 			setTimer1(10000);
+			setTimer4(250);
+			HAL_GPIO_WritePin(GPIOA, LGY_Pin|LGX_Pin,GPIO_PIN_SET);
 		}
 		if (isButton2Pressed() == 1) {
 			SetYellowTime++;
-			updateRealTime(SetYellowTime,SetYellowTime);
+			updateRealTime(SetYellowTime,3);
 		}
 		led7_run();
 		if (isButton3Pressed() == 1) {
@@ -77,25 +79,38 @@ void fsm_manual_run() {
 		}
 		break;
 	case MAN_GREEN:
-		HAL_GPIO_WritePin(LRY_GPIO_Port, LRY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LYY_GPIO_Port, LYY_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LGY_GPIO_Port, LGY_Pin, GPIO_PIN_SET);
-		HAL_GPIO_WritePin(LRX_GPIO_Port, LRX_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LYX_GPIO_Port, LYX_Pin, GPIO_PIN_RESET);
-		HAL_GPIO_WritePin(LGX_GPIO_Port, LGX_Pin, GPIO_PIN_SET);
-		updateRealTime(SetGreenTime,SetGreenTime);
+		if (timer4_flag == 1) {
+			setTimer4(250);
+			HAL_GPIO_TogglePin(GPIOA, LGY_Pin|LGX_Pin);
+		}
+		HAL_GPIO_WritePin(GPIOA, LRX_Pin|LRY_Pin|LYY_Pin|LYX_Pin, GPIO_PIN_RESET);
+		updateRealTime(SetGreenTime,4);
 		if (timer1_flag == 1) {
 			status = AUTO_GREEN_Y;
 			setTimer1(5000);
 		}
+		if (isButton1Pressed() == 1) {
+			setTimer1(LedGreenTime * 1000);
+			setTimer2(1000);
+			status = AUTO_GREEN_Y;
+			Green_Time_Y = LedGreenTime;
+			Red_Time_X = LedRedTime;
+		}
 		if (isButton2Pressed() == 1) {
 			SetGreenTime++;
-			updateRealTime(SetGreenTime,SetGreenTime);
+			updateRealTime(SetGreenTime,4);
 		}
 		led7_run();
 		if (isButton3Pressed() == 1) {
 			LedGreenTime = SetGreenTime;
-			LedRedTime = LedGreenTime + LedYellowTime;
+			LedYellowTime = SetYellowTime;
+			LedRedTime = SetRedTime;
+			if (LedRedTime > (LedYellowTime + LedGreenTime)) {
+				LedGreenTime = LedRedTime - LedYellowTime;
+			}
+			if (LedRedTime < (LedYellowTime + LedGreenTime)) {
+				LedRedTime = LedGreenTime + LedYellowTime;
+			}
 			status = AUTO_GREEN_Y;
 			setTimer1(LedGreenTime * 1000);
 			setTimer2(1000);
