@@ -16,6 +16,8 @@ int Green_Time_X = 0;
 int Yellow_Time_Y = 0;
 int Yellow_Time_X = 0;
 
+
+
 void fsm_automatic_run() {
     switch (status) {
         case INIT:

@@ -21,12 +21,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "software_timer.h"
-//#include "button.h"
-//#include "fsm_automatic.h"
-//#include "global.h"
-//#include "fsm_manual.h"
-#//include "support_void.h"
+#include "software_timer.h"
+#include "button.h"
+#include "fsm_automatic.h"
+#include "global.h"
+#include "fsm_manual.h"
+#include "support_void.h"
 #include "scheduler.h"
 /* USER CODE END Includes */
 
@@ -104,7 +104,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  SCH_Add_Task(led1test, 100, 200);
+  SCH_Init();
+  SCH_Add_Task(timerRun, 1, 10);
+  SCH_Add_Task(getKeyInput, 1, 10);
+  SCH_Add_Task(fsm_automatic_run, 1, 10);
+  SCH_Add_Task(fsm_manual_run, 1, 10);
   while (1)
   {
 	  SCH_Dispatch_Tasks();

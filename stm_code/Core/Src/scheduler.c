@@ -47,3 +47,23 @@ void SCH_Dispatch_Tasks(void) {
 		}
 	}
 }
+
+void SCH_Delete(uint32_t taskID) {
+    uint8_t index = 0;
+    for(; index < current_index_task; index++) {
+        if(SCH_tasks_G[index].TaskID == taskID) {
+            break;
+        }
+    }
+
+    if(index < current_index_task) {
+        for(uint8_t i = index; i < current_index_task-1; i++) {
+            SCH_tasks_G[i].pTask = SCH_tasks_G[i+1].pTask;
+            SCH_tasks_G[i].Delay = SCH_tasks_G[i+1].Delay;
+            SCH_tasks_G[i].Period = SCH_tasks_G[i+1].Period;
+            SCH_tasks_G[i].RunMe = SCH_tasks_G[i+1].RunMe;
+            SCH_tasks_G[i].TaskID = SCH_tasks_G[i+1].TaskID;
+        }
+        current_index_task--;
+    }
+}
